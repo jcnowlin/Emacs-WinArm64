@@ -1,0 +1,119 @@
+# Emacs for Windows ARM64 — portable bundle builder
+#
+# Runs on GitHub's native ARM64 Windows runner and produces a
+# self-contained Emacs zip for the Surface Pro X (SQ1): unzip it
+# anywhere, run bin\runemacs.exe. No MSYS2 install needed on the
+# Surface, and the bundle never touches %APPDATA%\.emacs.d, so the
+# EmacsCore config (init.el, vendor tree, cheatsheet) is unaffected
+# by updates.
+#
+# Two methods, chosen at dispatch time:
+#   repackage (default) — bundle MSYS2's own published
+#     mingw-w64-clang-aarch64-emacs package. Fast, tracks upstream.
+#   source — compile a GNU Emacs release tarball in CLANGARM64.
+#     Slower; for when you want configure flags MSYS2 didn't pick.
+#
+# The monthly schedule always uses `repackage`. Releases are only
+# created when the Emacs version is new to this repo, so scheduled
+# runs are quiet no-ops when MSYS2 hasn't moved.
+#
+# Setup: put this file at .github/workflows/emacs-windows-arm64.yml
+# and the two .sh files at .github/workflows/scripts/ in the repo.
+
+name: Emacs Windows ARM64
+
+on:
+  workflow_dispatch:
+    inputs:
+      method:
+        description: Build method
+        type: choice
+        options:
+          - repackage
+          - source
+        default: repackage
+      emacs_version:
+        description: GNU Emacs version (source method only)
+        type: string
+        default: "31.1"
+  schedule:
+    # 06:17 UTC on the 3rd of each month.
+    - cron: "17 6 3 * *"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: emacs-arm64
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: windows-11-arm
+    timeout-minutes: 180
+    defaults:
+      run:
+        shell: msys2 {0}
+    steps:
+      - name: Check out this repo (for the scripts)
+        uses: actions/checkout@v4
+
+      - name: Set up MSYS2 CLANGARM64
+        uses: msys2/setup-msys2@v2
+        with:
+          msystem: CLANGARM64
+          update: true
+          install: >-
+            ${{ (inputs.method == 'source' && github.event_name == 'workflow_dispatch')
+              && 'make mingw-w64-clang-aarch64-make mingw-w64-clang-aarch64-cc mingw-w64-clang-aarch64-gnutls mingw-w64-clang-aarch64-libxml2 mingw-w64-clang-aarch64-tree-sitter mingw-w64-clang-aarch64-sqlite3 mingw-w64-clang-aarch64-libjpeg-turbo mingw-w64-clang-aarch64-libpng mingw-w64-clang-aarch64-libtiff mingw-w64-clang-aarch64-giflib mingw-w64-clang-aarch64-libwebp mingw-w64-clang-aarch64-harfbuzz mingw-w64-clang-aarch64-freetype mingw-w64-clang-aarch64-fontconfig mingw-w64-clang-aarch64-zlib'
+              || 'mingw-w64-clang-aarch64-emacs' }}
+
+      - name: Repackage the MSYS2 Emacs build
+        if: ${{ inputs.method != 'source' || github.event_name == 'schedule' }}
+        run: bash .github/workflows/scripts/package-msys2.sh
+
+      - name: Build Emacs from source
+        if: ${{ inputs.method == 'source' && github.event_name == 'workflow_dispatch' }}
+        run: bash .github/workflows/scripts/build-source.sh "${{ inputs.emacs_version }}"
+
+      - name: Smoke test the bundle outside the MSYS2 shell
+        shell: pwsh
+        run: |
+          $bundle = Get-ChildItem dist -Directory | Select-Object -First 1
+          $exe = Join-Path $bundle.FullName "bin\emacs.exe"
+          if (-not (Test-Path $exe)) { throw "bundle missing bin\emacs.exe" }
+          & $exe --version
+          $cfg = & $exe --batch --eval '(message "%s" system-configuration)' 2>&1 | Out-String
+          Write-Host $cfg
+          if ($cfg -notmatch "aarch64") { throw "unexpected system-configuration: $cfg" }
+
+      - name: Zip the bundle
+        shell: pwsh
+        run: |
+          $bundle = Get-ChildItem dist -Directory | Select-Object -First 1
+          $zip = "$($bundle.Name).zip"
+          Compress-Archive -Path "$($bundle.FullName)\*" -DestinationPath $zip
+          Write-Host "zipped $zip"
+
+      - name: Upload the bundle as a workflow artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: emacs-windows-arm64
+          path: "*.zip"
+          retention-days: 30
+
+      - name: Publish a release if this Emacs version is new
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $ver = (Get-Content dist/VERSION.txt).Trim()
+          $tag = "emacs-$ver-arm64"
+          gh release view $tag *> $null
+          if ($LASTEXITCODE -eq 0) {
+            Write-Host "release $tag already exists; skipping"
+            exit 0
+          }
+          $zip = Get-ChildItem *.zip | Select-Object -First 1
+          $notes = "Portable Emacs $ver for Windows ARM64 (Surface Pro X / SQ1). Unzip anywhere and run bin\runemacs.exe. Built by the Emacs Windows ARM64 workflow, method: ${{ inputs.method || 'repackage (scheduled)' }}."
+          gh release create $tag $zip.FullName --title "Emacs $ver — Windows ARM64 portable" --notes $notes
