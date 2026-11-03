@@ -35,8 +35,10 @@ https://www.msys2.org, open the **MSYS2 CLANGARM64** terminal,
 
 ## Step 2 — the supporting tools (Scoop, PowerShell)
 
-- `scoop install pwsh` — PowerShell 7: the `C-c t` terminal and the
-  dev layout's bottom pane run it. (Without it, the terminal falls
+- PowerShell 7 — the `C-c t` terminal and the dev layout's bottom
+  pane run it. On jProX it is the GUI .msi install
+  (`C:\Program Files\PowerShell\7\pwsh.exe`, also on PATH);
+  `scoop install pwsh` works too. (Without it, the terminal falls
   back to cmd.)
 - `scoop install pandoc` — the markdown renderer shells out to pandoc.
   There is no native Windows ARM64 pandoc; the x86_64 build runs under
