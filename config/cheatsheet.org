@@ -1,0 +1,166 @@
+#+TITLE: Emacs, Translated — a JCN English Cheatsheet
+#+STARTUP: showall
+
+Open this page any time with =C-c h=. It lives at
+~/.config/emacs/cheatsheet.org~; the short version of the same list
+is in the Noctalia shortcuts panel (the bar button).
+The longer walkthrough (navigation plus the features as
+configured here) is the guide; open it any time with =C-c g=.
+
+* How to read Emacs key notation
+
+Emacs writes keys its own way. The decoder:
+
+- =C-= means Ctrl. =C-n= is Ctrl+N.
+- =M-= means Alt (old keyboards called it Meta). =M-f= is Alt+F.
+- Keys are pressed in sequence, not all at once, when written apart:
+  =C-x C-f= is Ctrl+X, release, then Ctrl+F.
+- =RET= is Enter, =SPC= is the spacebar, =DEL= is Backspace.
+
+* Moving around
+
+- =C-n= (next-line) — move down one line
+- =C-p= (previous-line) — move up one line
+- =C-f= (forward-char) — move right one character
+- =C-b= (backward-char) — move left one character
+- =C-a= (move-beginning-of-line) — start of the line
+- =C-e= (move-end-of-line) — end of the line
+- =M-f= (forward-word) — jump right one whole word
+- =M-b= (backward-word) — jump left one whole word
+- =C-v= (scroll-up) — page down
+- =M-v= (scroll-down) — page up
+- =M-<= (beginning-of-buffer) — jump to the very top of the file
+- =M->= (end-of-buffer) — jump to the very bottom of the file
+- =C-l= (recenter) — scroll so your line sits in the middle of the screen
+- =C-s= (consult-line, in this setup) — search in this file: type to
+  filter the matching lines, Enter jumps to one
+
+* Buffers and panes
+
+Emacs calls an open file a /buffer/ and a pane a /window/ (see the
+word list below). These are the keys that move between them.
+
+- =C-x b= (switch-to-buffer) — jump to another open file
+- =C-x C-f= (find-file) — open a file
+- =C-x C-s= (save-buffer) — save the current file
+- =C-x o= (other-window) — jump to the next pane
+- =C-x 2= (split-window-below) — split the pane top-and-bottom
+- =C-x 3= (split-window-right) — split the pane side-by-side
+- =C-x 0= (delete-window) — close this pane (the file stays open)
+- =C-x 1= (delete-other-windows) — close every other pane
+- =C-x k= (kill-buffer) — close the current file for real
+- =C-c t= (my/pwsh) — open the terminal inside Emacs (PowerShell 7;
+  on jNix this same key opens ghostel)
+- =C-c L= (my/layout-dev) — the dev layout in one keystroke: main
+  pane (your init.el, or a file/directory you pick with =C-u=),
+  cheatsheet in the right half, terminal in the bottom quarter
+- =C-x C-c= (save-buffers-kill-terminal) — close this Emacs window;
+  the background Emacs keeps running, and so do your open files
+- =C-g= (keyboard-quit) — the panic button: cancels whatever Emacs
+  is in the middle of asking you
+
+* Keys for this setup
+
+- =C-x t 2= (tab-bar-new-tab) — open a new tab; new frames start
+  with two (the About screen, then your dashboard)
+- =C-x t o= (tab-next) — move to the next tab
+- =C-x t 0= (tab-bar-close-tab) — close this tab
+- =C-x g= (magit-status) — git status and commits for the project
+  the current file belongs to
+- =C-.= (embark-act) — a menu of actions for the thing under the
+  cursor: a link, a file name, a word
+- =C-c g= (my/open-guide) — open the getting-around guide
+- =C-c h= (my/open-cheatsheet) — open this cheatsheet
+
+* Extra features
+
+The pieces that are not stock Emacs, in this setup:
+
+- *Markdown viewer* (custom-built) — a =.md= file opens as a
+  formatted page, with the editable original in the tab next to
+  it: edit and save the original and the formatted page refreshes
+  itself; press =g= in the formatted page to rebuild it by hand
+- *Corfu* — completion suggestions pop up as you type; =TAB=
+  takes the highlighted one
+- *Vertico, Orderless, Marginalia* — every pick-a-thing menu
+  (files, buffers, =M-x=) filters as you type, matches words in
+  any order, and shows extra notes in the margins
+- *Forge* — Magit also talks to the git server: pull requests
+  and issues appear inside the =C-x g= view
+- *PDF Tools* — PDFs open inside Emacs: =n= and =p= turn pages,
+  =C-s= searches the text
+- *Nov* — =.epub= ebooks open inside Emacs as readable documents
+- *mu4e* — mail inside Emacs: =M-x mu4e= opens the inbox
+- *Calendar fetch* — =M-x my/fetch-gcal-ical= pulls the Google
+  Calendar into the Emacs diary
+- *envrc* — opening a file inside a project folder loads that
+  project environment automatically
+
+* Built into Emacs
+
+The parts that were already in the box (this build is Emacs 31.1):
+
+- *Org Mode* — outlines, notes and agendas: the calendar agenda
+  and the guide and cheatsheet pages all run on it
+- *Dired* — the built-in file manager: =C-x d= opens a folder as
+  an editable listing
+- *Calendar and Diary* — =M-x calendar= opens the built-in
+  calendar; the Google Calendar feed lands in its diary
+- *Calc* — =M-x calc=: a full scientific calculator; algebra,
+  units, dates
+- *EWW* — =M-x eww=: a simple web browser inside Emacs
+- *Eshell* — =M-x eshell=: a shell inside Emacs that also
+  understands Emacs commands
+- *TRAMP* — open files on other machines, or as root with sudo,
+  by path, as if they were local
+- *Ediff* — =M-x ediff=: compare two files side by side and
+  merge the differences
+- *VC* — =C-x v=: the built-in front end for git; status, diffs,
+  history, commits
+- *Project* — =C-x p=: work by project; find a file, search, or
+  open a shell in the current project
+- *Eglot* — the built-in language-server client: smart
+  completion, jump-to-definition, error checking for code
+- *Tree-sitter* — precise syntax parsing built in: better
+  highlighting and indentation in code modes
+- *Ibuffer* — =M-x ibuffer=: the buffer list with sorting,
+  grouping and bulk actions
+- *Keyboard macros* — =F3= starts recording your keystrokes,
+  =F4= stops and replays them
+- *Bookmarks* — =C-x r m= sets a bookmark in a file, =C-x r b=
+  jumps back to it
+- *Gnus* — the built-in mail and news framework; mu4e's message
+  view is built on it
+- *Image display* — PNG, JPEG, GIF, TIFF, WebP and SVG pictures
+  render inside Emacs; that is how PDFs and the mailpiece scan
+  show up
+- *Native compilation and SQLite* — Emacs Lisp compiles to
+  native code for speed, and a real SQLite database is built in
+  for anything that needs one
+
+* Asking Emacs itself
+
+- =C-h k= (describe-key) — press it, then press any key combo, and
+  Emacs tells you that combo's name and what it does
+- =M-x= (execute-extended-command) — Alt+X: run any command by
+  typing its name; the completion list lets you browse
+
+- Press =C-x= (or =C-c=) and just wait (which-key) — a panel lists
+  every key you can press next and what each one does
+
+* Words, translated
+
+- *point* — where your cursor is sitting
+- *buffer* — an open file; Emacs's word for a document or tab
+- *frame* — a desktop window; what everyone else calls a window
+- *window* — a pane inside a frame; what everyone else calls a split
+- *mark* — the anchor spot; selected text runs from the mark to the cursor
+- *region* — the selected text between the mark and the cursor
+- *kill* — cut; killed text goes to the kill ring
+- *yank* — paste; pulls the newest killed text back in
+- *kill ring* — the clipboard's memory: every cut and copy, newest first
+- *minibuffer* — the one-line prompt strip at the very bottom where
+  Emacs asks questions
+- *mode line* — the status bar at the bottom of each pane
+- *daemon* — the background Emacs process that is always running
+- *client* — a window connected to the daemon; Super+E opens one

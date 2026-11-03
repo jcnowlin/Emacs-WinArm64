@@ -19,6 +19,8 @@ itself. GitHub hosts the machine: the `windows-11-arm` runner.
   `.github/workflows/emacs-windows-arm64.yml` in the repo.
 - `package-msys2.sh`, `build-source.sh` — the build scripts. Put
   them at `.github/workflows/scripts/` in the repo.
+- `config/` — the EmacsCore config (init.el, cheatsheet, guide,
+  bookmarks, vendored packages, install.ps1). See below.
 
 Repo: `jcnowlin/Emacs-WinArm64`, public. Public because the ARM
 runner minutes are free for public repos and the repo contains
@@ -64,6 +66,18 @@ costs a few billed minutes.
    and it never touches `%APPDATA%\.emacs.d`, so the EmacsCore
    config (init.el, the vendored packages, the cheatsheet and
    guide) carries over untouched.
+
+## The EmacsCore config
+
+The `config/` folder is the Surface's Emacs configuration, the
+editing core of the jNix setup ported to Windows (see
+`config/README.md` for what is in it and what is deliberately not).
+It ships as `emacscore-config.zip`, attached to every binary
+release and kept current on the rolling `config-latest` release by
+the config-release workflow whenever `config/` changes on main.
+Updating the Surface's config: download that zip, unzip, run
+`config/install.ps1`. private.el (mail secrets) is never part of
+this repo.
 
 ## Known deltas and caveats
 

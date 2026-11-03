@@ -1,0 +1,277 @@
+#+TITLE: Getting Around in Your Emacs
+#+AUTHOR: Bill, for James
+#+DATE: 2026-10-29
+
+This is a walkthrough of the Emacs setup on jNix: how to move around,
+and how to use the pieces we actually installed. Your key tables live
+in the cheatsheet (=C-c h=); this guide is the "what do I do with it"
+companion. Keys open this guide with =C-c g=.
+
+* The one idea to learn first: the daemon
+
+Emacs itself is always running in the background (the "daemon").
+What you open with Super+E, the desktop menu, or a terminal is just a
+*frame*: a window looking into that one long-lived Emacs.
+
+- Super+E opens a graphical frame. Super+Shift+E opens a text frame
+  inside Ghostty. The right-click desktop menu's "Emacs" entry does
+  the same as Super+E.
+- Closing a frame does not quit Emacs. Your buffers, undo history,
+  and open files all stay alive in the daemon. Open a new frame and
+  everything is still there, instantly.
+- A fresh frame starts with two tabs: tab 1 is the classic "About
+  GNU Emacs" screen, tab 2 is your dashboard (recent files and
+  projects). That arrangement is deliberate.
+- =C-x C-c= in a frame only closes that frame. It asks about saving
+  unsaved buffers first.
+
+* Org mode, from zero
+
+This guide, the cheatsheet (=C-c h=), and the calendar agenda are
+all Org mode, so here is the whole thing in one section. Org is
+not a separate app: it is a way of writing plain-text files
+(names ending in =.org=) with a few simple conventions, and
+Emacs understands the structure. The files are ordinary text;
+any editor can open them, nothing is locked in.
+
+The conventions are really only these:
+
+- A line starting with =*= is a heading. More stars means a
+  deeper level: =**= is a sub-heading under the =*= above it.
+- A line starting with =-= or =+= is a list item.
+- A date in angle brackets, like =<2026-11-02 Mon>=, is a
+  timestamp. This is the part the agenda reads.
+- Emphasised text uses single characters: =*bold*=, =/italic/=,
+  and ==code== written with equals signs either side.
+
+Reading is the main skill, and it is one key: press =TAB= on a
+heading to fold it shut or open it again. Long documents like
+this guide are meant to be collapsed to their headings and
+opened one section at a time. =Shift-TAB= cycles the whole
+document between three views: just the top headings, all
+headings, and everything.
+
+Editing is nothing new: it is text, so type, delete, and save
+with =C-x C-s= like anywhere else. If you want to rearrange,
+=M-Left= and =M-Right= push a heading deeper or shallower, and
+=M-Up= and =M-Down= move a heading up or down the document.
+
+What Org does for you in this setup, without you writing any:
+
+- The agenda (=M-x org-agenda=, then =a=) reads your diary and
+  shows the coming week; the dashboard agenda section does the
+  same on the start page.
+- This guide and the cheatsheet are Org files you read with the
+  folding keys above.
+
+Org can also do task lists with TODO and DONE states, tables,
+and much more, but none of that is required here. Headings,
+lists, folding: that is genuinely enough to engage with
+everything in this setup.
+
+* Getting unstuck
+
+- =C-g= cancels almost anything: a half-typed command, a stuck
+  prompt, a selection you regret. When in doubt, =C-g=.
+- Pressing Escape three times also bails out of most prompts.
+- *Which-key:* press a prefix like =C-x= and then just wait a
+  second. A panel appears at the bottom listing every key you can
+  press next and what it does. This is your built-in teacher; use it
+  whenever you forget what follows =C-x= or =C-c=.
+- *Ask Emacs itself:* =C-h k= then any key tells you what that key
+  does. =C-h f= describes a command, =C-h v= a setting. The
+  cheatsheet has the full help table.
+
+* Moving around
+
+** Files and buffers
+
+- =C-x C-f= opens a file. Start typing any part of its path or name;
+  the completion list filters as you type, and the words you type can
+  match *in any order* (that is the "orderless" completion we set
+  up). Enter opens, =C-g= backs out.
+- Files remember where you were: reopen a file and the cursor is
+  back where you left it. Recent files are remembered across
+  sessions; find them again through =C-x b= below or the dashboard.
+- =C-x b= switches buffers. It shows open buffers, recent files, and
+  bookmarks in one searchable list; type a few letters and Enter.
+- =C-x C-s= saves. =C-x k= closes ("kills") the current buffer.
+
+** Inside a file
+
+- The arrow keys and mouse work the way you expect. The Emacs keys
+  are in the cheatsheet's "Moving around" table.
+- =C-s= searches the current file, but here it is *consult-line*:
+  type a word and every matching line in the file is listed; arrow
+  to the one you want, Enter jumps there.
+- =M-g g= goes to a line number.
+- =C-l= recenters the screen on your cursor (tap again to cycle
+  top, middle, bottom).
+
+** Windows and tabs
+
+- One frame can hold several *windows* (panes showing buffers):
+  =C-x 2= splits top/bottom, =C-x 3= side by side, =C-x o= moves to
+  the other pane, =C-x 0= closes the current pane, =C-x 1= makes the
+  current pane the only one.
+- *Tabs* are separate workspaces in the same frame: =C-x t 2= new
+  tab, =C-x t o= next tab, =C-x t 0= close tab. Your start tabs
+  (About + dashboard) are an example.
+
+* Editing survival kit
+
+- Undo is =C-/= (or =C-x u=). There is no redo key; undoing and
+  then typing starts a new branch, and undo can itself be undone.
+- Cut, copy, paste: =C-w= cuts the selection, =M-w= copies, =C-y=
+  pastes ("yanks"). After pasting, =M-y= swaps the pasted text for
+  older things you cut or copied.
+- No selection? =C-k= cuts from the cursor to the end of the line,
+  and what it cuts can be pasted with =C-y=.
+- =C-SPC= starts a selection ("sets the mark"); move the cursor to
+  stretch it. =C-x C-x= jumps between the mark and the cursor.
+- =M-%= is find-and-replace across the file: it asks at each match,
+  =y= replace, =n= skip, =!= replace all remaining.
+- =M-;= comments or uncomments the current line or selection.
+- =C-x h= selects the whole buffer.
+
+* Finding any command
+
+You never have to memorize command names. Press =M-x=, type part of
+the name in any order, and Enter. Everything in this guide that
+starts "M-x ..." works this way. The descriptions next to commands
+in the list (that is "marginalia") tell you what each one does.
+
+=C-.= (control + period) is *embark*: a context menu for whatever
+the cursor is on: a file name, a web link, a buffer, a word. It
+offers sensible actions for that thing, including opening, copying,
+or acting on it somewhere else. Think of it as right-click for the
+keyboard.
+
+While you type in a buffer, a small popup offers completions
+(that is "corfu"); Tab accepts, arrows choose, =C-g= dismisses.
+
+* The features we set up
+
+** The dashboard (tab 2 of a new frame)
+
+Your landing pad: recent files and projects, one Enter away. It is
+also a command: =M-x dashboard-open= brings it up any time. Press
+=g= on it to refresh the lists.
+
+** Magit: git without leaving Emacs (=C-x g=)
+
+=C-x g= opens the status screen for the repo the current file lives
+in: what changed, what is staged, recent commits, your branches.
+
+- =s= stages the file (or line region) at the cursor, =u= unstages.
+- =c= then =c= starts a commit: write the message in the buffer
+  that opens, then =C-c C-c= to finish it.
+- =P= then =p= pushes. =F= then =p= pulls.
+- =b= then =b= switches branches. =l= then =l= shows the log.
+- =q= quits back to your file. Which-key works inside Magit too:
+  press a key and wait to see the menu.
+- *Forge* connects Magit to forge.jcn: your issues and pull
+  requests show up in the status screen as sections you can open
+  with Enter. =M-x forge-pull= refreshes them. Creating a pull
+  request from a pushed branch is =M-x forge-create-pull-request=.
+
+** Ghostel: a real terminal inside Emacs (=C-c t=)
+
+=C-c t= opens a terminal running on Ghostty's own engine, so it
+behaves like your Ghostty windows, colors and all. Good for quick
+shell work next to the file you are editing. The shell you get is
+your normal login shell.
+
+** Project environments (direnv/envrc, automatic)
+
+When you open a file inside a project that has an =.envrc= (your
+Nix projects do), Emacs quietly loads that project's environment:
+its tools land on the path for shells, compilers, and the language
+server, per project, automatically. There is nothing to run. If an
+environment ever feels stale after you change a flake, =M-x
+envrc-reload= refreshes it.
+
+** Nix files get a language server
+
+Open any =.nix= file and it connects to nixd: real completion,
+jump-to-definition with =M-.= (=M-,= comes back), references with
+=M-?=, and =M-x eglot-rename= to rename a thing everywhere it is
+used. Hover help is =M-x eldoc= if a symbol's meaning is unclear.
+
+** Reading: PDFs and EPUBs
+
+Open a =.pdf= and it renders in Emacs (pdf-tools): scroll to read,
+=C-s= searches the text, =+= and =-= zoom. Open an =.epub= and it
+opens as a readable book (nov). No external viewer involved.
+
+** Markdown
+
+=.md= files open in markdown-mode, and =README.md= gets the
+GitHub-flavored variant, matching how forge.jcn renders them.
+
+** Your calendar (=M-x my/fetch-gcal-ical=)
+
+Your three Google calendars (Personal, Bkm, GCL) feed in through
+secret iCal links. =M-x my/fetch-gcal-ical= downloads them fresh
+into your agenda diary. Then =M-x org-agenda= and press =a= for the
+week view. Honest limits: the feeds are one-way (reading, not
+editing), and Google refreshes them on its own schedule, so a
+brand-new event can lag; fetching again is the only lever.
+
+** Your Gmail (=M-x mu4e=)
+
+Mail lives in Emacs through mu4e: mbsync pulls, mu indexes, msmtp
+sends. In the mu4e main screen:
+
+- =U= fetches new mail and re-indexes.
+- =s= searches (try =from:unt= or a date like =date:20261020..=).
+- =j= jumps straight to a folder, Enter on a message reads it.
+- =C= composes; in the compose buffer, =C-c C-c= sends.
+- Sent mail behavior is deliberate: Gmail files your sent copy
+  itself, so Emacs deletes its local duplicate. Nothing is lost.
+
+** Themes
+
+You are wearing =ef-melissa-light= (picked 2026-10-29, loaded in
+your init.el). To look at the rest of the family: =M-x load-theme=,
+type =ef-=, and pick one, e.g. =ef-autumn= for the dark warm one.
+=M-x ef-themes-select= gives a picker with previews of what each
+looks like on your actual text. Loading a theme this way lasts
+until the daemon restarts; Melissa stays your permanent default
+unless the init.el line changes.
+
+* A few neat things
+
+** Dired: the built-in file manager (=C-x d=)
+
+Open a directory instead of a file and you get a file listing you
+can work in: Enter opens, =m= marks files, =C= copies marked files,
+=R= renames, =D= deletes marked, =+= creates a directory, =q=
+leaves. It is faster than it looks and it never leaves Emacs.
+
+** Keyboard macros: record repetitive edits
+
+Doing the same little edit 40 times? =C-x (= starts recording,
+do the edit once, =C-x )= stops. =C-x e= replays it; keep pressing
+=e= to replay again on each next spot. Macros vanish when the
+daemon restarts, so they are for the job at hand.
+
+** Run a shell command without leaving (=M-!=)
+
+=M-!= runs one shell command and shows its output in a small
+buffer. With =C-u= first (=C-u M-!=), the output lands in your
+current buffer at the cursor instead: handy for dropping a date, a
+checksum, or a directory listing straight into a document.
+
+** Bookmarks (=C-x r m= / =C-x r b=)
+
+=C-x r m= drops a named bookmark where you are, in any file.
+=C-x r b= jumps to one from anywhere. Bookmarks also appear in the
+=C-x b= list, so often you do not even need the jump command.
+
+** It is all still there tomorrow
+
+Because the daemon never quits, a frame you close is not work you
+closed. If Emacs ever does get killed ungracefully (power cut,
+crash), reopen the file and =M-x recover-file= offers back what
+you had not saved.

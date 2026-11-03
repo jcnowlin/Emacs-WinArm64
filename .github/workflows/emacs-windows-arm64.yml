@@ -95,6 +95,12 @@ jobs:
           Compress-Archive -Path "$($bundle.FullName)\*" -DestinationPath $zip
           Write-Host "zipped $zip"
 
+      - name: Zip the EmacsCore config
+        shell: pwsh
+        run: |
+          Compress-Archive -Path "config\*" -DestinationPath "emacscore-config.zip"
+          Write-Host "zipped emacscore-config.zip"
+
       - name: Upload the bundle as a workflow artifact
         uses: actions/upload-artifact@v4
         with:
@@ -114,6 +120,6 @@ jobs:
             Write-Host "release $tag already exists; skipping"
             exit 0
           }
-          $zip = Get-ChildItem *.zip | Select-Object -First 1
-          $notes = "Portable Emacs $ver for Windows ARM64 (Surface Pro X / SQ1). Unzip anywhere and run bin\runemacs.exe. Built by the Emacs Windows ARM64 workflow, method: ${{ inputs.method || 'repackage (scheduled)' }}."
-          gh release create $tag $zip.FullName --title "Emacs $ver — Windows ARM64 portable" --notes $notes
+          $zips = (Get-ChildItem *.zip).FullName
+          $notes = "Portable Emacs $ver for Windows ARM64 (Surface Pro X / SQ1). Unzip anywhere and run bin\runemacs.exe. Built by the Emacs Windows ARM64 workflow, method: ${{ inputs.method || 'repackage (scheduled)' }}. The emacscore-config.zip asset is the matching EmacsCore config."
+          gh release create $tag $zips --title "Emacs $ver — Windows ARM64 portable" --notes $notes

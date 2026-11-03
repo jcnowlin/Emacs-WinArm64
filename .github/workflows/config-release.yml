@@ -1,0 +1,44 @@
+# EmacsCore config release — keeps a rolling `config-latest`
+# release carrying emacscore-config.zip, refreshed whenever the
+# config/ folder changes on main. The binary releases (see
+# emacs-windows-arm64.yml) attach the same zip when they are cut.
+
+name: EmacsCore Config Release
+
+on:
+  push:
+    branches: [main]
+    paths: ["config/**"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: config-release
+  cancel-in-progress: false
+
+jobs:
+  config:
+    runs-on: windows-latest
+    timeout-minutes: 15
+    steps:
+      - name: Check out this repo
+        uses: actions/checkout@v4
+
+      - name: Zip the EmacsCore config
+        shell: pwsh
+        run: |
+          Compress-Archive -Path "config\*" -DestinationPath "emacscore-config.zip"
+          Write-Host "zipped emacscore-config.zip"
+
+      - name: Publish to the rolling config-latest release
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release view config-latest *> $null
+          if ($LASTEXITCODE -ne 0) {
+            gh release create config-latest --title "EmacsCore config (latest)" --notes "Rolling release of the EmacsCore config from the config/ folder of this repo. Download emacscore-config.zip, unzip it, and run install.ps1 from the unzipped folder."
+          }
+          gh release upload config-latest emacscore-config.zip --clobber
